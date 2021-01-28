@@ -33,6 +33,7 @@ import alarm_feature
 import google_search
 import currency_converter
 import webbrowser
+import calculator_file
 
 # Initialising pyttsx
 engine = pyttsx3.init()
@@ -183,6 +184,10 @@ def start_assistant():
                 command = command.replace("map", "")
                 webbrowser.open_new(f"https://www.google.com/maps/place/{command}")
                 speak(f"Here is what I found for {command} on Google Maps")     
+
+            elif "multiply" or "add" or "subtract" or "divide" in command:
+                result = calculator_file.calculate(command)
+                speak(result)
 
             else:
                 pass
