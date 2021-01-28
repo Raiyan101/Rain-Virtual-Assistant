@@ -30,6 +30,9 @@ import sys
 import weather_feature
 import subprocess
 import alarm_feature
+import google_search
+import currency_converter
+import webbrowser
 
 # Initialising pyttsx
 engine = pyttsx3.init()
@@ -166,6 +169,20 @@ def start_assistant():
                     if "\\" in path:
                         path = path.replace("\\", "/")
                     open_file(path)
+
+            elif "search google" in command:
+                res = google_search.search(command)
+                speak(res)
+
+            elif "convert" in command:
+                res = currency_converter.convert(command)
+                speak(res)
+
+            elif "search map" in command:
+                command = command.replace("search", "")
+                command = command.replace("map", "")
+                webbrowser.open_new(f"https://www.google.com/maps/place/{command}")
+                speak(f"Here is what I found for {command} on Google Maps")     
 
             else:
                 pass
