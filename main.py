@@ -80,7 +80,6 @@ def take_command():
             print("Sorry didn't get that, could you please repeat?")
         return command
 
-
 def start_assistant():
     while True:
         try:
@@ -183,11 +182,20 @@ def start_assistant():
                 command = command.replace("search", "")
                 command = command.replace("map", "")
                 webbrowser.open_new(f"https://www.google.com/maps/place/{command}")
-                speak(f"Here is what I found for {command} on Google Maps")     
+                speak(f"Here is what I found for {command} on Google Maps")  
 
-            elif "multiply" or "add" or "subtract" or "divide" in command:
+            elif "make a note" in command or "write this down" in command or "remember this" in command or "add a note" in command:
+                fileName = str(datetime.date.today()) + str(datetime.datetime.now().strftime("%H:%M:%S")).replace(":", "-") + ".txt"
+                speak("What would you like me to write down?")
+                text = take_command()
+                with open(fileName, "w") as f:
+                    f.write(text)
+                open_file(os.getcwd() + "\\" + fileName)
+
+            elif "multiply" in command or "add" in command or "subtract" in command or "divide" in command:
                 result = calculator_file.calculate(command)
-                speak(result)
+                if result != None:
+                    speak(result)
 
             else:
                 pass

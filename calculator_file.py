@@ -3,7 +3,10 @@ def calculate(command):
     try:
         try:
             command = command.replace("multiply", "")
-            command = command.replace("by", "")
+            if "by" in command:
+                command = command.replace("by", "")
+            elif "to" in command:
+                command = command.replace("to", "")
             command = command.replace(" ", ";")
             new_command = ""
             for x in range(len(command)):
@@ -35,8 +38,19 @@ def calculate(command):
             pass
 
         try:
+            #command = command.replace("add", "")
             command = command.replace("add", "")
-            command = command.replace("in", "")
+            if "in" in command:
+                command = command.replace("in", "")
+            elif "plus" in command:
+                command = command.replace("plus", "")
+            elif "+" in command:
+                command = command.replace("+", "")
+            elif "to" in command:
+                command = command.replace("to", "")
+            elif "by" in command:
+                command = command.replace("by", "")
+            
             command = command.replace(" ", ";")
             new_command = ""
             for x in range(len(command)):
@@ -69,7 +83,10 @@ def calculate(command):
 
         try:
             command = command.replace("subtract", "")
-            command = command.replace("from", "")
+            if "from" in command:
+                command = command.replace("from", "")
+            elif "by" in command:
+                command = command.replace("by", "")
             command = command.replace(" ", ";")
             new_command = ""
             for x in range(len(command)):
@@ -103,7 +120,12 @@ def calculate(command):
 
         try:
             command = command.replace("divide", "")
-            command = command.replace("by", "")
+            if "by" in command:
+                command = command.replace("by", "")
+            elif "to" in command:
+                command = command.replace("to", "")
+            elif "from" in command:
+                command = command.replace("from", "")
             command = command.replace(" ", ";")
             new_command = ""
             for x in range(len(command)):
@@ -135,7 +157,7 @@ def calculate(command):
             pass
 
         if result == None:
-            return "Sorry didn't get that, could you please repeat?"
+            pass
 
     except:
-        return "Sorry didn't get that, could you please repeat?"
+        pass
