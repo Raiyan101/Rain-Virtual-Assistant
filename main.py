@@ -66,7 +66,6 @@ def weather_command():
             print("Sorry didn't get that, could you please repeat?")
         return city_name
 
-
 def take_command():
     recogniser = sr.Recognizer()
     with sr.Microphone() as source:

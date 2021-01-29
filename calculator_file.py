@@ -87,6 +87,10 @@ def calculate(command):
                 command = command.replace("from", "")
             elif "by" in command:
                 command = command.replace("by", "")
+            elif "minus" in command:
+                command = command.replace("minus", "")
+            elif "-" in command:
+                command = command.replace("-", "")
             command = command.replace(" ", ";")
             new_command = ""
             for x in range(len(command)):
