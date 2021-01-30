@@ -191,7 +191,7 @@ def start_assistant():
                     f.write(text)
                 open_file(os.getcwd() + "\\" + fileName)
 
-            elif "multiply" in command or "add" in command or "subtract" in command or "divide" in command:
+            elif "x" in command or "multiply" in command or "add" in command or "subtract" in command or "divide" in command:
                 result = calculator_file.calculate(command)
                 if result != None:
                     speak(result)

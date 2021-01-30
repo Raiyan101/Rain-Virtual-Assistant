@@ -2,11 +2,24 @@ def calculate(command):
     result = None
     try:
         try:
-            command = command.replace("multiply", "")
+            if "x" in command:
+                command = command.replace("x", "")
+            elif "multiply" in command:
+                command = command.replace("multiply", "")
+            elif "multiplied" in command:
+                command = command.replace("multiplied", "")
+            
+            if "what" in command:
+                command = command.replace("what", "")
+
+            if "is" in command:
+                command = command.replace("is", "")
+
             if "by" in command:
                 command = command.replace("by", "")
             elif "to" in command:
                 command = command.replace("to", "")
+
             command = command.replace(" ", ";")
             new_command = ""
             for x in range(len(command)):
