@@ -1,4 +1,6 @@
 def calculate(command):
+    if "hey" in command:
+        command = command.replace("hey", "")
     result = None
     try:
         try:
@@ -83,7 +85,6 @@ def calculate(command):
                 command = command.replace("by", "")
             
             command = command.replace(" ", ";")
-            
             new_command = ""
             for x in range(len(command)):
                 if x != 0:
@@ -167,10 +168,10 @@ def calculate(command):
             pass
 
         try:
-            if "divide" in command:
-                command = command.replace("divide", "")
-            elif "divided" in command:
+            if "divided" in command:
                 command = command.replace("divided", "")
+            elif "divide" in command:
+                command = command.replace("divide", "")
             elif "/" in command:
                 command = command.replace("/", "")
 

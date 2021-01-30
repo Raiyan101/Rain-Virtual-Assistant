@@ -34,6 +34,10 @@ import google_search
 import currency_converter
 import webbrowser
 import calculator_file
+import app
+import threading
+import json
+import random
 
 # Initialising pyttsx
 engine = pyttsx3.init()
@@ -42,12 +46,20 @@ engine.setProperty('voice', voices[0].id)
 
 # function for audio output
 
-
 def speak(text):
+    update("console", text)
     engine.say(text)
     print(text)
     engine.runAndWait()
 
+def update(key, value):
+    data = None
+    with open('temp.json', 'r') as f:
+        data = json.load(f)
+        data["data"][0][key] = value
+
+    with open('temp.json', 'w') as f:
+        json.dump(data, f)
 
 def open_file(user_input):
     os.startfile(user_input)
@@ -84,6 +96,7 @@ def start_assistant():
         try:
             command = take_command()
             command = command.lower()
+            update("console", command)
 
             # Common Questions
             if "what is your name" in command:
@@ -130,7 +143,7 @@ def start_assistant():
                 speak("Goodbye, Have a nice day")
                 break
 
-            elif "send email" in command:
+            elif "send email" in command or "send mail" in command:
                 email_feature.send_email_again()
 
             elif "weather" in command:
@@ -181,22 +194,23 @@ def start_assistant():
                 command = command.replace("search", "")
                 command = command.replace("map", "")
                 webbrowser.open_new(f"https://www.google.com/maps/place/{command}")
-                speak(f"Here is what I found for {command} on Google Maps")  
+                speak(f"Here is what I found for {command} on Google Maps") 
 
             elif "make a note" in command or "write this down" in command or "remember this" in command or "add a note" in command:
                 fileName = str(datetime.date.today()) + str(datetime.datetime.now().strftime("%H:%M:%S")).replace(":", "-") + ".txt"
                 speak("What would you like me to write down?")
+                
                 text = take_command()
                 with open(fileName, "w") as f:
                     f.write(text)
                 open_file(os.getcwd() + "\\" + fileName)
+                speak("I added this note for you")
 
             elif "x" in command or "multiplied" in command or "multiply" in command or "add" or "+" in command or "-" in command or "/" in command in command or "subtract" in command or "divide" or "divided" in command:
                 result = calculator_file.calculate(command)
                 result = "The answer is " + str(result)
                 if result != None:
                     speak(result)
-
             else:
                 pass
 
@@ -207,4 +221,11 @@ def start_assistant():
             print(f"Error: {e}")
 
 
-start_assistant()
+#start_assistant()
+
+def start():
+    t2 = threading.Thread(target=start_assistant)
+    t2.start()
+    app.start_gui()
+
+start()
