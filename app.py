@@ -11,7 +11,7 @@ root.configure(background="white")
 
 settingsIconCanvas = tk.Canvas(root, width=40, height=40, bg="white", bd=0, highlightthickness=0)
 settingsIconCanvas.grid(row=0, column=0, pady=20, sticky="w", padx=20)
-settingsIcon = tk.PhotoImage(master= settingsIconCanvas,file="Rain-Virtual-Assistant/icons/settings-icon-png-1-original.gif")
+settingsIcon = tk.PhotoImage(master= settingsIconCanvas,file="icons/settings-icon-png-1-original.gif")
 settingsIconCanvas.create_image(0, 0, anchor=tk.NW, image=settingsIcon)
 
 welcome_text = tk.Label(root, fg="#1c2434", bg="white", text="Hi, How can I help you?", font=("Helvetica", "20"))
