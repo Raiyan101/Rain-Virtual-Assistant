@@ -83,7 +83,7 @@ def calculate(command):
                 command = command.replace("by", "")
             
             command = command.replace(" ", ";")
-            print(command)
+            
             new_command = ""
             for x in range(len(command)):
                 if x != 0:
