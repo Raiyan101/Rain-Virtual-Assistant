@@ -19,6 +19,10 @@ def calculate(command):
                 command = command.replace("by", "")
             elif "to" in command:
                 command = command.replace("to", "")
+            elif "with" in command:
+                command = command.replace("with", "")
+            elif "into" in command:
+                command = command.replace("into", "")
 
             command = command.replace(" ", ";")
             new_command = ""
@@ -52,7 +56,21 @@ def calculate(command):
 
         try:
             #command = command.replace("add", "")
-            command = command.replace("add", "")
+
+            if "what" in command:
+                command = command.replace("what", "")
+            if "is" in command:
+                command = command.replace("is", "")
+
+            if "added" in command:
+                command = command.replace("added", "")
+
+            if "add" in command:
+                command = command.replace("add", "")
+
+            if "into" in command:
+                command = command.replace("into", "")
+
             if "in" in command:
                 command = command.replace("in", "")
             elif "plus" in command:
@@ -65,6 +83,7 @@ def calculate(command):
                 command = command.replace("by", "")
             
             command = command.replace(" ", ";")
+            print(command)
             new_command = ""
             for x in range(len(command)):
                 if x != 0:
@@ -95,7 +114,18 @@ def calculate(command):
             pass
 
         try:
-            command = command.replace("subtract", "")
+
+            if "subtracted" in command:
+                command = command.replace("subtracted", "")
+
+            if "subtract" in command:
+                command = command.replace("subtract", "")
+        
+            if "what" in command:
+                command = command.replace("what", "")
+            if "is" in command:
+                command = command.replace("is", "")
+
             if "from" in command:
                 command = command.replace("from", "")
             elif "by" in command:
@@ -104,6 +134,7 @@ def calculate(command):
                 command = command.replace("minus", "")
             elif "-" in command:
                 command = command.replace("-", "")
+
             command = command.replace(" ", ";")
             new_command = ""
             for x in range(len(command)):
@@ -136,13 +167,25 @@ def calculate(command):
             pass
 
         try:
-            command = command.replace("divide", "")
+            if "divide" in command:
+                command = command.replace("divide", "")
+            elif "divided" in command:
+                command = command.replace("divided", "")
+            elif "/" in command:
+                command = command.replace("/", "")
+
+            if "what" in command:
+                command = command.replace("what", "")
+
             if "by" in command:
                 command = command.replace("by", "")
             elif "to" in command:
                 command = command.replace("to", "")
             elif "from" in command:
                 command = command.replace("from", "")
+
+            if "is" in command:
+                command = command.replace("is", "")
             command = command.replace(" ", ";")
             new_command = ""
             for x in range(len(command)):
