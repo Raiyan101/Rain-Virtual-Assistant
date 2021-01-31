@@ -13,7 +13,31 @@ Modules needed for this to to work:
 
 ```pip install playsound```
 
+```pip install pytz```
+
+```pip install pyjokes```
+
+```pip install stdiomask```
+
+```pip install requests```
+
+
 
 Features:
 
 *Calculator
+*send emails 
+*Add alarms 
+*take notes 
+*currency convert 
+*google maps 
+*open up desktop apps 
+*calculator
+*Play youtube vids
+*Play music on spotify
+*check weather ///
+*check time ///
+*open up and search google 
+*get answers from wikipedia 
+*jokes 
+*Google calender
