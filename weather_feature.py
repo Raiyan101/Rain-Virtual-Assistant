@@ -1,12 +1,21 @@
 import requests
 from datetime import datetime
 import pyttsx3
+import json
 
 engine = pyttsx3.init()
 
 
 # Info to show: Temperature, Humidity, Wind speed, weather description
 
+def update(key, value):
+    data = None
+    with open('temp.json', 'r') as f:
+        data = json.load(f)
+        data["data"][0][key] = value
+
+    with open('temp.json', 'w') as f:
+        json.dump(data, f)
 
 def weather_forecast(city):
     try:
@@ -29,6 +38,15 @@ def weather_forecast(city):
             pressure = api_data["main"]["pressure"]
             date_time = datetime.now().strftime("%d %B %Y ||  %I:%M:%S %p")
             
+        update("console", 
+        f"""---------------------------------------------------------
+            Information/Stats on Weather of {location}. Time: {date_time}
+            ---------------------------------------------------------
+            The Current Temperature is {temperature}°C
+            The Current Weather condition is {weather_description}
+            The Current Humidty is {humidity}%
+            The Current Wind Speed is {wind_speed} kmph
+            The Current Atmospheric pressure is {pressure}(in hPa unit)""")
 
         print("---------------------------------------------------------")
         print(

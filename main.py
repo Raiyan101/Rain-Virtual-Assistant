@@ -51,6 +51,7 @@ import random
 import pytz  # Built in module
 
 
+CLOSE = {"close" : False}
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 MONTHS = ["january", "february", "march", "april", "may", "june",
           "july", "august", "september", "october", "november", "december"]
@@ -68,10 +69,10 @@ engine.setProperty('voice', voices[0].id)
 
 def speak(text):
     update("console", text)
+    app.hideIcon()
     engine.say(text)
     print(text)
     engine.runAndWait()
-
 
 def update(key, value):
     data = None
@@ -100,23 +101,38 @@ def weather_command():
             print("Sorry didn't get that, could you please repeat?")
         return city_name
 
+done = {"done" : False}
 
 def take_command():
+    if done["done"] != True:
+        speak("Hi, How can I help you?")
+        update("console", "Hi, How can I help you?")
+        done["done"] = True
+
     recogniser = sr.Recognizer()
     with sr.Microphone() as source:
         print("Listening: ")
+        app.showIcon()
+        update("console", "Listening .. ")
         audio = recogniser.listen(source)
         command = ""
         try:
             command = recogniser.recognize_google(audio)
+            app.hideIcon()
             print(command)
+            update("console", command)
         except Exception:
+            update("console", "Sorry didn't get that, could you please repeat?")
+            app.hideIcon()
             print("Sorry didn't get that, could you please repeat?")
+        
         return command
 
 
 def start_assistant():
     while True:
+        if CLOSE["close"] == True:
+            main_thread_close()
         try:
             command = take_command()
             command = command.lower()
@@ -230,26 +246,28 @@ def start_assistant():
             elif "search map" in command:
                 command = command.replace("search", "")
                 command = command.replace("map", "")
-                webbrowser.open_new(
-                    f"https://www.google.com/maps/place/{command}")
-                speak(f"Here is what I found for {command} on Google Maps")
+                webbrowser.open_new(f"https://www.google.com/maps/place/{command}")
+                speak(f"Here is what I found for {command} on Google Maps") 
 
             elif "make a note" in command or "write this down" in command or "remember this" in command or "add a note" in command:
-                fileName = str(datetime.date.today(
-                )) + str(datetime.datetime.now().strftime("%H:%M:%S")).replace(":", "-") + ".txt"
+                fileName = str(datetime.date.today()) + str(datetime.datetime.now().strftime("%H:%M:%S")).replace(":", "-") + ".txt"
                 speak("What would you like me to write down?")
-
+                
                 text = take_command()
                 with open(fileName, "w") as f:
                     f.write(text)
                 open_file(os.getcwd() + "\\" + fileName)
                 speak("I added this note for you")
 
-            elif "x" in command or "multiplied" in command or "multiply" in command or "add" or "+" in command or "-" in command or "/" in command in command or "subtract" in command or "divide" or "divided" in command:
+            elif "x" in command or "multiplied" in command or "multiply" in command or "add" in command or "into" in command or "+" in command or "plus" in command or "-" in command or "minus" in command or "/" in command or "subtract" in command or "divide" or "divided" in command:
                 result = calculator_file.calculate(command)
-                result = "The answer is " + str(result)
-                if result != None:
-                    speak(result)
+                result = str(result)
+                print(result)
+                try:
+                    if float(result) - 1 != False:
+                        speak(result)
+                except:
+                    pass
 
             elif "spotify" in command:
 
@@ -409,15 +427,6 @@ def get_date(text):
         return datetime.date(month=month, day=day, year=year)
 
 
-def note(text):
-    date = datetime.datetime.now()
-    file_name = str(date).replace(":", "-") + "-note.txt"
-    with open(file_name, "w") as f:
-        f.write(text)
-
-    subprocess.Popen(["notepad.exe", file_name])
-
-
 def start_calender(text):
 
     SERVICE = authenticate_google()
@@ -433,13 +442,28 @@ def start_calender(text):
                 get_events(date, SERVICE)
             else:
                 speak("I didn't quite get that")
-# start_assistant()
 
+
+
+
+def checkIfClosed():
+    with open("close.txt", "w") as f:
+        f.write("")
+
+    while True:
+        with open("close.txt") as f:
+            if f.read() == "CLOSE_FILE":
+                CLOSE["close"] = True
 
 def start():
     t2 = threading.Thread(target=start_assistant)
     t2.start()
+    t3 = threading.Thread(target=checkIfClosed)
+    t3.start()
     app.start_gui()
 
+try:
+    start()
+except:
+    pass
 
-start()
