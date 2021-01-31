@@ -1,22 +1,32 @@
 # Features:
-# Add Items to google calender and check for remainders ///
-# read and send emails ///
-# Add remainders and alarms ///
+# Google calender
+# send emails ///
+# Add alarms ///
 # notes ///
 # currency convert ///
 # google maps ///
-# open up desktop apps
-# calculator
-# Play yt vids ///
-# Play music on spotify or youtube
+# open up desktop apps ///
+# calculator ///
+# Play youtube vids ///
+# Play music on spotify
 # check weather ///
 # check time ///
 # open up and search google ///
 # get answers from wikipedia ///
 # jokes ///
-# news///
+
 
 # importing the required modules
+
+
+from __future__ import print_function
+import datetime
+import pickle
+import os.path
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+import datetime
 import pyttsx3  # pip install pyttsx
 import speech_recognition as sr  # pip install speechRecognition
 import datetime
@@ -38,6 +48,15 @@ import app
 import threading
 import json
 import random
+import pytz  # Built in module
+
+
+SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
+MONTHS = ["january", "february", "march", "april", "may", "june",
+          "july", "august", "september", "october", "november", "december"]
+DAYS = ["monday", "tuesday", "wednesday",
+        "thursday", "friday", "saturday", "sunday"]
+DAY_EXTENTIONS = ["rd", "th", "st", "nd"]
 
 # Initialising pyttsx
 engine = pyttsx3.init()
@@ -46,11 +65,13 @@ engine.setProperty('voice', voices[0].id)
 
 # function for audio output
 
+
 def speak(text):
     update("console", text)
     engine.say(text)
     print(text)
     engine.runAndWait()
+
 
 def update(key, value):
     data = None
@@ -60,6 +81,7 @@ def update(key, value):
 
     with open('temp.json', 'w') as f:
         json.dump(data, f)
+
 
 def open_file(user_input):
     os.startfile(user_input)
@@ -78,6 +100,7 @@ def weather_command():
             print("Sorry didn't get that, could you please repeat?")
         return city_name
 
+
 def take_command():
     recogniser = sr.Recognizer()
     with sr.Microphone() as source:
@@ -90,6 +113,7 @@ def take_command():
         except Exception:
             print("Sorry didn't get that, could you please repeat?")
         return command
+
 
 def start_assistant():
     while True:
@@ -111,6 +135,9 @@ def start_assistant():
             elif "how are you" in command:
                 speak("I am fine, thank you for asking, how are you?")
 
+            elif "i am fine" in command:
+                speak("Good to know")
+
             elif "joke" in command:
                 joke = joke_file.joke_choice()
                 speak(joke)
@@ -128,13 +155,23 @@ def start_assistant():
                 day = datetime.datetime.now().strftime("%A")
                 speak(f"The day today is {day} ")
 
-            elif "search wikipedia" in command:
-                command = command.replace("wikipedia", "")
+            elif "search wikipedia" in command or "wikipedia search" in command.lower():
+                if "search wikipedia" in command:
+
+                    command = command.replace("search wikipedia", "")
+
+                if "wikipedia search" in command:
+                    command = command.replace("wikipedia search", "")
+
                 result = wikipedia.summary(command, 1)
                 speak(result)
 
-            elif "on youtube" in command:
-                command = command.replace("on youtube", "")
+            elif "on youtube" in command or "search youtube" in command:
+                if "on youtube" in command:
+                    command = command.replace("on youtube", "")
+                if "search youtube" in command:
+                    command = command.replace("search youtube", "")
+
                 speak("Playing " + command)
                 pywhatkit.playonyt(command)
 
@@ -193,13 +230,15 @@ def start_assistant():
             elif "search map" in command:
                 command = command.replace("search", "")
                 command = command.replace("map", "")
-                webbrowser.open_new(f"https://www.google.com/maps/place/{command}")
-                speak(f"Here is what I found for {command} on Google Maps") 
+                webbrowser.open_new(
+                    f"https://www.google.com/maps/place/{command}")
+                speak(f"Here is what I found for {command} on Google Maps")
 
             elif "make a note" in command or "write this down" in command or "remember this" in command or "add a note" in command:
-                fileName = str(datetime.date.today()) + str(datetime.datetime.now().strftime("%H:%M:%S")).replace(":", "-") + ".txt"
+                fileName = str(datetime.date.today(
+                )) + str(datetime.datetime.now().strftime("%H:%M:%S")).replace(":", "-") + ".txt"
                 speak("What would you like me to write down?")
-                
+
                 text = take_command()
                 with open(fileName, "w") as f:
                     f.write(text)
@@ -211,6 +250,26 @@ def start_assistant():
                 result = "The answer is " + str(result)
                 if result != None:
                     speak(result)
+
+            elif "spotify" in command:
+
+                speak(
+                    "What is the name of the song/album or artist you want to search for: ")
+                song = take_command()
+
+                url = f"https://open.spotify.com/search/{song}"
+                webbrowser.open_new(url)
+                engine.say(
+                    "This is what I found")
+            command = command.lower()
+            options = ["what do i have", "do i have plans", "am i busy",
+                       "what event do i have", "what events do i have"]
+            for option in options:
+                if option in command:
+                    start_calender()
+
+            # elif "what do i have" in command or "do i have planes" in command or "am i busy" in command or "what events do i have" in command or "what event do i have " in command:
+                # start_calender()
             else:
                 pass
 
@@ -221,11 +280,138 @@ def start_assistant():
             print(f"Error: {e}")
 
 
-#start_assistant()
+def authenticate_google():
+    creds = None
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+
+    service = build('calendar', 'v3', credentials=creds)
+
+    return service
+
+
+def get_events(day, service):
+    date = datetime.datetime.combine(day, datetime.datetime.min.time())
+    end_date = datetime.datetime.combine(day, datetime.datetime.max.time())
+    utc = pytz.UTC
+    date = date.astimezone(utc)
+    end_date = end_date.astimezone(utc)
+
+    events_result = service.events().list(calendarId='primary', timeMin=date.isoformat(), timeMax=end_date.isoformat(),
+                                          singleEvents=True,
+                                          orderBy='startTime').execute()
+    events = events_result.get('items', [])
+
+    if not events:
+        speak('No upcoming events found.')
+    else:
+        speak(f"You have {len(events)} events on this day.")
+
+        for event in events:
+            start = event['start'].get('dateTime', event['start'].get('date'))
+            print(start, event['summary'])
+            start_time = str(start.split("T")[1].split("-")[0])
+            if int(start_time.split(":")[0]) < 12:
+                start_time = start_time + "am"
+            else:
+                start_time = str(int(start_time.split(":")[0])-12)
+                start_time = start_time + "pm"
+
+            speak(event["summary"] + " at " + start_time)
+
+
+def get_date(text):
+    text = text
+
+    text = text.lower()
+
+    today = datetime.date.today()
+
+    if text.count("today") > 0:
+        return today
+
+    day = -1
+    day_of_week = -1
+    month = -1
+    year = today.year
+
+    for word in text.split():
+        if word in MONTHS:
+            month = MONTHS.index(word) + 1
+        elif word in DAYS:
+            day_of_week = DAYS.index(word)
+        elif word.isdigit():
+            day = int(word)
+        else:
+            for ext in DAY_EXTENTIONS:
+                found = word.find(ext)
+                if found > 0:
+                    try:
+                        day = int(word[:found])
+                    except:
+                        pass
+
+    if month < today.month and month != -1:
+        year = year+1
+
+    if month == -1 and day != -1:
+        if day < today.day:
+            month = today.month + 1
+        else:
+            month = today.month
+
+    if month == -1 and day == -1 and day_of_week != -1:
+        current_day_of_week = today.weekday()
+        dif = day_of_week - current_day_of_week
+
+        if dif < 0:
+            dif += 7
+            if text.count("next") >= 1:
+                dif += 7
+
+        return today + datetime.timedelta(dif)
+
+    if day != -1:  # FIXED FROM VIDEO
+        return datetime.date(month=month, day=day, year=year)
+
+
+def start_calender():
+    global text
+    SERVICE = authenticate_google()
+    print("Start")
+    text = take_command()
+    text = text.lower()
+
+    CALENDAR_STRS = ["what do i have", "do i have plans",
+                     "am i busy", "what events do i have", "what event do i have"]
+    for phrase in CALENDAR_STRS:
+        if phrase in text.lower():
+            date = get_date(text)
+            if date:
+                get_events(date, SERVICE)
+            else:
+                speak("Please Try Again")
+
+
+# start_assistant()
+
 
 def start():
     t2 = threading.Thread(target=start_assistant)
     t2.start()
     app.start_gui()
+
 
 start()
