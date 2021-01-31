@@ -262,11 +262,12 @@ def start_assistant():
                 engine.say(
                     "This is what I found")
             command = command.lower()
+
             options = ["what do i have", "do i have plans", "am i busy",
                        "what event do i have", "what events do i have"]
             for option in options:
                 if option in command:
-                    start_calender()
+                    start_calender(command)
 
             # elif "what do i have" in command or "do i have planes" in command or "am i busy" in command or "what events do i have" in command or "what event do i have " in command:
                 # start_calender()
@@ -281,6 +282,9 @@ def start_assistant():
 
 
 def authenticate_google():
+    """Shows basic usage of the Google Calendar API.
+    Prints the start and name of the next 10 events on the user's calendar.
+    """
     creds = None
     if os.path.exists('token.pickle'):
         with open('token.pickle', 'rb') as token:
@@ -303,6 +307,7 @@ def authenticate_google():
 
 
 def get_events(day, service):
+    # Call the Calendar API
     date = datetime.datetime.combine(day, datetime.datetime.min.time())
     end_date = datetime.datetime.combine(day, datetime.datetime.max.time())
     utc = pytz.UTC
@@ -325,22 +330,35 @@ def get_events(day, service):
             start_time = str(start.split("T")[1].split("-")[0])
             if int(start_time.split(":")[0]) < 12:
                 start_time = start_time + "am"
+            for time in start_time:
+                length = len(start_time)
+                start_time += time
+                if length == 5:
+                    start_time = start_time + "am"
+                    break
+
             else:
                 start_time = str(int(start_time.split(":")[0])-12)
                 start_time = start_time + "pm"
+                for time in start_time:
+                    length = len(start_time)
+                    start_time += time
+                    if length == 5:
+                        start_time = start_time + "pm"
+                        break
 
             speak(event["summary"] + " at " + start_time)
 
 
 def get_date(text):
-    text = text
-
     text = text.lower()
-
     today = datetime.date.today()
 
     if text.count("today") > 0:
         return today
+
+    if text.count("tomorrow") > 0:
+        return today + datetime.timedelta(1)
 
     day = -1
     day_of_week = -1
@@ -363,15 +381,19 @@ def get_date(text):
                     except:
                         pass
 
+    # THE NEW PART STARTS HERE
+    # if the month mentioned is before the current month set the year to the next
     if month < today.month and month != -1:
         year = year+1
 
-    if month == -1 and day != -1:
+    # This is slighlty different from the video but the correct version
+    if month == -1 and day != -1:  # if we didn't find a month, but we have a day
         if day < today.day:
             month = today.month + 1
         else:
             month = today.month
 
+    # if we only found a dta of the week
     if month == -1 and day == -1 and day_of_week != -1:
         current_day_of_week = today.weekday()
         dif = day_of_week - current_day_of_week
@@ -387,24 +409,30 @@ def get_date(text):
         return datetime.date(month=month, day=day, year=year)
 
 
-def start_calender():
-    global text
+def note(text):
+    date = datetime.datetime.now()
+    file_name = str(date).replace(":", "-") + "-note.txt"
+    with open(file_name, "w") as f:
+        f.write(text)
+
+    subprocess.Popen(["notepad.exe", file_name])
+
+
+def start_calender(text):
+
     SERVICE = authenticate_google()
     print("Start")
-    text = take_command()
+    text = text
     text = text.lower()
 
-    CALENDAR_STRS = ["what do i have", "do i have plans",
-                     "am i busy", "what events do i have", "what event do i have"]
+    CALENDAR_STRS = ["what do i have", "do i have plans", "am i busy"]
     for phrase in CALENDAR_STRS:
-        if phrase in text.lower():
+        if phrase in text:
             date = get_date(text)
             if date:
                 get_events(date, SERVICE)
             else:
-                speak("Please Try Again")
-
-
+                speak("I didn't quite get that")
 # start_assistant()
 
 
