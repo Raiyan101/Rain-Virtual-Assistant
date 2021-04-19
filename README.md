@@ -1,5 +1,4 @@
 # Rain-Virtual-Assistant
-<<<<<<< HEAD
 This is a Virtual Assistant written In Python 
 =======
 Rain is a Virtual Assistant written In Python 
@@ -44,4 +43,4 @@ Features:
 *get answers from wikipedia 
 *jokes 
 *Google calender
->>>>>>> f6350d69a1ac8192878143c9ffb3f536f6e071e8
+
