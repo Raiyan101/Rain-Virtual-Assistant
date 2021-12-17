@@ -34,8 +34,7 @@ import joke_file  # File containing the jokes (not a module)
 import wikipedia  # pip install wikipedia
 import pywhatkit   # pip install pywhatkit
 import os
-import smtplib
-import email_feature  # file made by us
+import smtplib  # file made by us
 import sys
 import weather_feature
 import subprocess
@@ -44,7 +43,6 @@ import google_search
 import currency_converter
 import webbrowser
 import calculator_file
-import app
 import threading
 import json
 import random
@@ -66,27 +64,13 @@ engine.setProperty('voice', voices[0].id)
 
 # function for audio output
 
-
 def speak(text):
-    update("console", text)
-    app.hideIcon()
     engine.say(text)
     print(text)
     engine.runAndWait()
 
-def update(key, value):
-    data = None
-    with open('temp.json', 'r') as f:
-        data = json.load(f)
-        data["data"][0][key] = value
-
-    with open('temp.json', 'w') as f:
-        json.dump(data, f)
-
-
 def open_file(user_input):
     os.startfile(user_input)
-
 
 def weather_command():
     recogniser = sr.Recognizer()
@@ -106,24 +90,17 @@ done = {"done" : False}
 def take_command():
     if done["done"] != True:
         speak("Hi, How can I help you?")
-        update("console", "Hi, How can I help you?")
         done["done"] = True
 
     recogniser = sr.Recognizer()
     with sr.Microphone() as source:
         print("Listening: ")
-        app.showIcon()
-        update("console", "Listening .. ")
         audio = recogniser.listen(source)
         command = ""
         try:
             command = recogniser.recognize_google(audio)
-            app.hideIcon()
             print(command)
-            update("console", command)
         except Exception:
-            update("console", "Sorry didn't get that, could you please repeat?")
-            app.hideIcon()
             print("Sorry didn't get that, could you please repeat?")
         
         return command
@@ -136,7 +113,6 @@ def start_assistant():
         try:
             command = take_command()
             command = command.lower()
-            update("console", command)
 
             # Common Questions
             if "what is your name" in command:
@@ -195,9 +171,6 @@ def start_assistant():
             elif "quit" == command or "goodbye" == command or "bye" == command:
                 speak("Goodbye, Have a nice day")
                 break
-
-            elif "send email" in command or "send mail" in command:
-                email_feature.send_email_again()
 
             elif "weather" in command:
                 location = weather_command()
@@ -455,15 +428,4 @@ def checkIfClosed():
             if f.read() == "CLOSE_FILE":
                 CLOSE["close"] = True
 
-def start():
-    t2 = threading.Thread(target=start_assistant)
-    t2.start()
-    t3 = threading.Thread(target=checkIfClosed)
-    t3.start()
-    app.start_gui()
-
-try:
-    start()
-except:
-    pass
-
+start_assistant()
